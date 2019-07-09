@@ -8,6 +8,17 @@ var keys = require("./keys.js");
 // usage
 let usage = "Usage: node liri.js [concert-this|spotify-this-song|movie-this] search_item \n or node liri.js do-what-it-ways";
 
+// Build name from arg list
+function buildNameFromArgList(argList) {
+    nameRes = "";
+    for (let i = 3; i < argList.length - 1; i++) {
+        nameRes += (argList[i] + " ");
+    }
+    nameRes += argList[argList.length - 1];
+
+    return nameRes;
+}
+
 // Liri commands
 liriCommands = {
     // concert-this
@@ -15,11 +26,7 @@ liriCommands = {
         if (argList.length < 4) {
             console.log("Need more arguments. \n" + usage);
         } else {
-            artistName = "";
-            for (let i = 3; i < argList.length-1; i++) {
-                artistName += (argList[i] + " ");
-            }
-            artistName += argList[argList.length-1];
+            artistName = buildNameFromArgList(argList);
             console.log("artist name: " + artistName);
 
             // use axios to call bands-in-town API
@@ -55,7 +62,26 @@ liriCommands = {
         if (argList.length < 4) {
             console.log("Need more arguments. \n" + usage);
         } else {
-            console.log("spotify-this-song: " + argList[3]);
+            songName = buildNameFromArgList(argList);
+            console.log("song name: " + songName);
+            
+            // call spotify api
+            var Spotify = require('node-spotify-api');
+            var spotify = new Spotify(keys.spotify);
+            //console.log(keys.spotify);
+
+            spotify
+                .search({ type: 'track', query: songName, limit: 1 })
+                .then(function (response) {
+                    songInfo = response.tracks.items[0];
+                    console.log('Artist(s): ' + songInfo.artists[0].name);
+                    console.log("Song's name: " + songInfo.name);
+                    console.log("Preview link: " + songInfo.external_urls.spotify);
+                    console.log("Album name: " + songInfo.album.name);
+                })
+                .catch(function (err) {
+                    console.log(err);
+                });
         }
     },
 
