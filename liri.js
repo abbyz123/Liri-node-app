@@ -64,7 +64,7 @@ liriCommands = {
         } else {
             songName = buildNameFromArgList(argList);
             console.log("song name: " + songName);
-            
+
             // call spotify api
             var Spotify = require('node-spotify-api');
             var spotify = new Spotify(keys.spotify);
@@ -87,17 +87,59 @@ liriCommands = {
 
     // movie-this
     "movie-this": (argList) => {
+        let movieName;
         if (argList.length < 4) {
-            console.log("Need more arguments. \n" + usage);
+            console.log("Don't have an idea? Let me give you one.");
+            movieName = "Mr. Nobody"
         } else {
-            console.log("movie-this: " + argList[3]);
+            // get movie name from argument list
+            movieName = buildNameFromArgList(argList);
         }
+
+        const axios = require('axios');
+        axios.get("http://www.omdbapi.com/?apikey=trilogy&t=" + movieName)
+            .then(function (response) {
+                movieInfo = response.data;
+                console.log("Title: " + movieInfo.Title);
+                console.log("Year: " + movieInfo.Year);
+                console.log("IMDB rating: " + movieInfo.imdbRating);
+                console.log("Other ratings: ");
+                movieInfo.Ratings.forEach(ratingInfo => {
+                    console.log(ratingInfo.Source + ": " + ratingInfo.Value);
+                });
+                console.log("Country: " + movieInfo.Country);
+                console.log("Language: " + movieInfo.Language);
+                console.log("Plot: " + movieInfo.Plot);
+                console.log("Actor(s): " + movieInfo.Actors);
+            })
+            .catch(function (error) {
+                // handle error
+                console.log("Fail to load movie info. Maybe another movie?")
+            })
+            .finally(function () {
+                // always executed
+            });
+
     },
 
     // do-what-it-says
     "do-what-it-says": (argList) => {
         // ignore whatever after "do-what-it-ways" command
-        console.log("do-what-it-says: " + argList[3]);
+        let fs = require('fs');
+
+        fs.readFile('random.txt', 'utf8', (err, data) => {
+            if (err) throw err;
+            //console.log(data);
+            let commandArgs = data.split(",");
+            if ("do-what-it-says" === commandArgs[0]) {
+                console.log("I don't do what it says!");
+            } else if (commandArgs[0] in liriCommands) {
+                let argListNew = ["", "", commandArgs[0], commandArgs[1]];
+                liriCommands[commandArgs[0]](argListNew);
+            } else {
+                console.log("random command not recognized.");
+            }
+        });
     }
 };
 
