@@ -6,7 +6,7 @@ var keys = require("./keys.js");
 //console.log(keys.spotify);
 
 // usage
-let usage = "Usage: node liri.js [concert-this|spotify-this-song|movie-this] search_item \n or node liri.js do-what-it-ways";
+let usage = "Usage: node liri.js [concert-this|spotify-this-song|movie-this] search_item \n or node liri.js do-what-it-says";
 
 // Build name from arg list
 function buildNameFromArgList(argList) {
@@ -63,11 +63,10 @@ liriCommands = {
             console.log("Need more arguments. \n" + usage);
         } else {
             songName = buildNameFromArgList(argList);
-            console.log("song name: " + songName);
 
             // call spotify api
-            var Spotify = require('node-spotify-api');
-            var spotify = new Spotify(keys.spotify);
+            let Spotify = require('node-spotify-api');
+            let spotify = new Spotify(keys.spotify);
             //console.log(keys.spotify);
 
             spotify
